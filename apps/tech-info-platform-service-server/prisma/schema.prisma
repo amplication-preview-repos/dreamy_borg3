@@ -1,0 +1,79 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Comment {
+  author        String?
+  content       Content? @relation(fields: [contentId], references: [id])
+  contentId     String?
+  createdAt     DateTime @default(now())
+  id            String   @id @default(cuid())
+  parentComment String?
+  text          String?
+  updatedAt     DateTime @updatedAt
+}
+
+model Notification {
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+  createdAt  DateTime  @default(now())
+  id         String    @id @default(cuid())
+  isRead     Boolean?
+  message    String?
+  updatedAt  DateTime  @updatedAt
+  user       User?     @relation(fields: [userId], references: [id])
+  userId     String?
+}
+
+model Content {
+  author      String?
+  category    Category?             @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  comments    Comment[]
+  createdAt   DateTime              @default(now())
+  description String?
+  id          String                @id @default(cuid())
+  mediaType   EnumContentMediaType?
+  mediaUrl    String?
+  title       String?
+  updatedAt   DateTime              @updatedAt
+}
+
+model Category {
+  contents      Content[]
+  createdAt     DateTime       @default(now())
+  description   String?
+  id            String         @id @default(cuid())
+  name          String?
+  notifications Notification[]
+  updatedAt     DateTime       @updatedAt
+}
+
+model User {
+  bio             String?
+  createdAt       DateTime          @default(now())
+  email           String?           @unique
+  firstName       String?
+  id              String            @id @default(cuid())
+  lastName        String?
+  notifications   Notification[]
+  password        String
+  profileImageUrl String?
+  roles           Json
+  updatedAt       DateTime          @updatedAt
+  userType        EnumUserUserType?
+  username        String            @unique
+}
+
+enum EnumContentMediaType {
+  Option1
+}
+
+enum EnumUserUserType {
+  Option1
+}
